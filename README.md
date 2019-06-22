@@ -10,10 +10,59 @@ With little configuration, trace information is passed between services and repo
 
 In this repo, ideas and solutions are illustrated by applying them to a contrived example. There is not much real business related functionality implemented and the idea of the example is to have multiple services working together to loosely reflect a real world scenario.
 
-There are 4 different services in this example. `Account Service` is the main service to which client (browser) interacts with. `Account Service` in turns calls `Payment Service` and `Profile Service` for the relevant information for the requested account id. `Payment Service`, upon receiving the request, will also calls `Credit Service` for the information. A random delay is added to each service's processing to simulate the time used in processing the business logic.
+There are 4 different services in this example. `Account Service` is the main service with which client (browser) interacts. `Account Service` in turns calls `Payment Service` and `Profile Service` for the relevant information for the requested account id. `Payment Service`, upon receiving the request, also calls `Credit Service` for the credit information. A random delay is added to each service's processing to simulate the time used in processing the business logic.
 
 
 ![example](./docs/img/configuration.png)
+
+## Jaeger
+
+[Jaeger](https://github.com/jaegertracing/jaeger) is a distributed system provided by Uber. 
+
+>It is used for monitoring and troubleshooting microservices-based distributed systems, including:
+>* Distributed context propagation
+>* Distributed transaction monitoring
+>* Root cause analysis
+>* Service dependency analysis
+>* Performance / latency optimization
+
+It is [OpenTracing]((https://opentracing.io/)) compatible and provides instrumentation libraries in major programming languages.
+
+
+## Spring Boot Configuration
+
+Spring Boot/Cloud integration is available via [java-spring-cloud](https://github.com/opentracing-contrib/java-spring-cloud) project. It is as simple as adding necessary dependency to the project.
+
+`pom.xml` configruation
+
+```
+<dependency>
+    <groupId>io.opentracing.contrib</groupId>
+    <artifactId>opentracing-spring-jaeger-cloud-starter</artifactId>
+</dependency>
+```
+
+`application.yaml` configuration
+```
+opentracing:
+  spring:
+    cloud:
+      log:
+        enabled: true
+  jaeger:
+    enabled: true
+    #    probabilistic-sampler:
+    #      sampling-rate: 1.0
+    log-spans: true
+    udp-sender:
+      host: localhost
+      port: 6831
+    # demonstration purpose only
+    const-sampler:
+      decision: true
+    service-name: account-service
+```
+
 
 ## Building The Services
 
@@ -54,7 +103,7 @@ curl http://localhost:8080/accounts/123
 
 ## Oberserve the Trace
 
-Jaeger is available at `http://localhost:16686/`
+Jaeger UI is available at `http://localhost:16686`
 
 
 From the left panel, select `account-service` from the `Services` dropdown list and click the `Find Traces` button.
@@ -63,7 +112,7 @@ All available traces will show up on the main panel. Click any trace to dive int
 
 ![trace](docs/img/trace.png)
 
-Click a span will provide details about that particular span
+Click a span will take you to the detail view about that particular span
 
 ![span](docs/img/trace_detail.png)
 
