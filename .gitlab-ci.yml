@@ -9,24 +9,28 @@ stages:
 .build-template:
   stage: build services
   script:
-    - docker build -t account-service $SERVICE_PATH
+    - docker build -t $SERVICE_NAME $SERVICE_PATH
 
 build account:
   extends: .build-template
   variables:
+    SERVICE_NAME: account-service
     SERVICE_PATH: ./account-service
 
 build payment:
   extends: .build-template
   variables:
+    SERVICE_NAME: payment-service
     SERVICE_PATH: ./payment-service
 
 build credit:
   extends: .build-template
   variables:
+    SERVICE_NAME: credit-service
     SERVICE_PATH: ./credit-service
 
 build profile:
   extends: .build-template
   variables:
+    SERVICE_NAME: profile-service
     SERVICE_PATH: ./profile-service        
